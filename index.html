@@ -854,6 +854,180 @@ draw(0);
 
 </script>
 
+
+<section class="panel" id="free-ai-studio" style="background:#1b1b2b;color:#fff;border:1px solid #514969;border-radius:16px;padding:16px;margin:16px 0;font-family:Arial,sans-serif">
+
+  <h2>🤖 AI Studio — Free Tools</h2>
+
+  <p>Chọn chức năng để mở công cụ AI bên ngoài. Các dịch vụ có thể giới hạn lượt dùng, thời gian chờ hoặc thay đổi trạng thái.</p>
+
+  <label for="freeAiTask">Bạn muốn làm gì?</label>
+
+  <select id="freeAiTask" style="display:block;width:100%;padding:10px;margin:8px 0;background:#11111c;color:white;border-radius:8px">
+
+    <option value="sing">1. Làm ảnh chân dung hát theo MP3</option>
+
+    <option value="motion">2. Làm ảnh chân dung chuyển động</option>
+
+    <option value="video">3. Tạo video từ ảnh và mô tả</option>
+
+    <option value="mv">4. Lên kịch bản MV ngay trong app</option>
+
+  </select>
+
+  <label for="freeAiDesc">Mô tả cảnh hoặc phong cách</label>
+
+  <textarea id="freeAiDesc" rows="3" placeholder="Ví dụ: ca sĩ Việt Nam, ánh sáng điện ảnh, sân khấu lung linh..." style="display:block;width:100%;padding:10px;margin:8px 0;background:#11111c;color:white;border-radius:8px"></textarea>
+
+  <label for="freeAiLyrics">Lời bài hát (không bắt buộc)</label>
+
+  <textarea id="freeAiLyrics" rows="4" placeholder="Dán lời bài hát để lên phân cảnh MV..." style="display:block;width:100%;padding:10px;margin:8px 0;background:#11111c;color:white;border-radius:8px"></textarea>
+
+  <button type="button" id="freeAiMake" style="padding:11px;border-radius:8px;background:#7955dd;color:white;border:0;margin:5px 0">✨ Tạo prompt / kịch bản</button>
+
+  <textarea id="freeAiOutput" rows="10" placeholder="Kết quả sẽ xuất hiện ở đây..." style="display:block;width:100%;padding:10px;margin:8px 0;background:#11111c;color:white;border-radius:8px"></textarea>
+
+  <button type="button" id="freeAiCopy" style="padding:10px;border-radius:8px">📋 Sao chép kết quả</button>
+
+  <button type="button" id="freeAiOpen" style="padding:10px;border-radius:8px;background:#24685b;color:white">🚀 Mở công cụ phù hợp</button>
+
+  <p id="freeAiStatus" role="status" style="color:#8ee8d9"></p>
+
+  <hr style="border-color:#514969;margin:18px 0">
+
+  <h3>Các công cụ AI tham khảo</h3>
+
+  <p><a href="https://huggingface.co/spaces/Acmason/sadtalker-demo" target="_blank" rel="noopener" style="color:#c7b7ff">SadTalker — ảnh chân dung + âm thanh</a></p>
+
+  <p><a href="https://huggingface.co/spaces/Han-123/LivePortrait" target="_blank" rel="noopener" style="color:#c7b7ff">LivePortrait — làm chân dung chuyển động</a></p>
+
+  <p><a href="https://huggingface.co/spaces/wavespeed/wan-image-to-video" target="_blank" rel="noopener" style="color:#c7b7ff">Wan Image-to-Video — tạo video từ ảnh</a></p>
+
+  <p style="font-size:13px;color:#d5cde8">Đây là các demo bên ngoài, không phải chức năng chạy trực tiếp trong GitHub Pages. Khả năng hoạt động và hạn mức miễn phí tùy dịch vụ.</p>
+
+</section>
+
+<script>
+
+(function(){
+
+  const $ = id => document.getElementById(id);
+
+  const links = {
+
+    sing: "https://huggingface.co/spaces/Acmason/sadtalker-demo",
+
+    motion: "https://huggingface.co/spaces/Han-123/LivePortrait",
+
+    video: "https://huggingface.co/spaces/wavespeed/wan-image-to-video"
+
+  };
+
+  function makePlan(){
+
+    const task = $("freeAiTask").value;
+
+    const desc = $("freeAiDesc").value.trim() || "nhân vật chính của MV";
+
+    const lyrics = $("freeAiLyrics").value.trim();
+
+    let prompt = "";
+
+    if(task === "sing"){
+
+      prompt = "Animate the provided portrait to sing along to the supplied audio. Preserve the person's identity and facial features. Use natural mouth movement, subtle blinking and gentle head movement. Avoid facial distortion. Scene: " + desc + ".";
+
+    } else if(task === "motion"){
+
+      prompt = "Animate the provided image into a natural, cinematic portrait video. Preserve identity, clothing and background. Add subtle movement, natural blinking and gentle camera motion. Avoid flicker and warping. Scene: " + desc + ".";
+
+    } else if(task === "video"){
+
+      prompt = "Create a short cinematic image-to-video sequence using the provided image as the visual reference. Preserve the main subject and composition. Add smooth camera motion and realistic movement. Scene: " + desc + ".";
+
+    } else {
+
+      const scenes = lyrics
+
+        ? lyrics.split(/\n|(?<=[.!?。！？])/).map(x=>x.trim()).filter(Boolean)
+
+        : ["Mở đầu giới thiệu nhân vật","Cảnh chính theo giai điệu","Cảnh cao trào giàu cảm xúc","Kết thúc ấn tượng"];
+
+      prompt = "KỊCH BẢN MV\nPhong cách: " + desc + "\n\n";
+
+      scenes.forEach((scene,i)=>{
+
+        prompt += "Cảnh " + (i+1) + ": " + scene +
+
+          "\nHình ảnh: thể hiện nội dung câu hát bằng hình ảnh điện ảnh.\n" +
+
+          "Máy quay: chuyển động chậm, mượt; giữ nhân vật nhất quán.\n" +
+
+          "Chuyển cảnh: hòa theo nhịp nhạc.\n\n";
+
+      });
+
+      prompt += "Gợi ý dựng: đồng bộ chuyển cảnh với nhịp bài hát, giữ màu sắc nhất quán và kết thúc tự nhiên.";
+
+    }
+
+    $("freeAiOutput").value = prompt;
+
+    $("freeAiStatus").textContent = "Đã tạo " + (task==="mv" ? "kịch bản MV" : "prompt") + ".";
+
+  }
+
+  $("freeAiMake").addEventListener("click", makePlan);
+
+  $("freeAiCopy").addEventListener("click", async function(){
+
+    const box = $("freeAiOutput");
+
+    if(!box.value){
+
+      $("freeAiStatus").textContent = "Hãy tạo prompt hoặc kịch bản trước.";
+
+      return;
+
+    }
+
+    try{
+
+      await navigator.clipboard.writeText(box.value);
+
+      $("freeAiStatus").textContent = "Đã sao chép.";
+
+    }catch(e){
+
+      box.focus();
+
+      box.select();
+
+      $("freeAiStatus").textContent = "Nhấn giữ phần nội dung rồi chọn Sao chép.";
+
+    }
+
+  });
+
+  $("freeAiOpen").addEventListener("click", function(){
+
+    const task = $("freeAiTask").value;
+
+    if(task === "mv"){
+
+      $("freeAiStatus").textContent = "Kịch bản đã tạo trong app. Sao chép để dùng khi dựng MV.";
+
+      return;
+
+    }
+
+    window.open(links[task], "_blank", "noopener");
+
+  });
+
+})();
+
+</script>
 </body>
 
 </html>
