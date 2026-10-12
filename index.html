@@ -1,16 +1,14 @@
 
 
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="vi">
 
 <head>
 
-<meta charset="UTF-8">
+<meta charset="utf-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
-<meta name="theme-color" content="#101020">
 
 <title>AI Video Studio</title>
 
@@ -18,57 +16,43 @@
 
 *{box-sizing:border-box}
 
-body{margin:0;background:#101020;color:#f8f7ff;font-family:system-ui,sans-serif}
+body{margin:0;background:#10101b;color:#f4f3ff;font:15px Arial,sans-serif}
 
-header{padding:20px;background:#191933;position:sticky;top:0;z-index:3}
+header{padding:20px;background:#201d35;text-align:center}
 
-h1{font-size:23px;margin:0}
+h1{margin:0 0 8px;color:#c4b5fd}
 
-header p,.hint{color:#bbb9d8;font-size:13px}
+main{max-width:900px;margin:auto;padding:12px}
 
-main{max-width:760px;margin:auto;padding:12px}
+.panel{background:#1b1b2a;border:1px solid #45425f;border-radius:14px;padding:14px;margin-bottom:14px}
 
-.panel{background:#1b1b35;padding:15px;border-radius:15px;margin:12px 0}
+label{display:block;color:#c8c4e0;margin:12px 0 5px}
 
-h2{font-size:17px;margin:0 0 12px}
+input,select,textarea,button{font:inherit;border-radius:9px;padding:10px;width:100%;border:1px solid #51496d;background:#11111c;color:white}
 
-label{display:block;font-size:13px;margin:12px 0 6px}
+button{background:#6d5ce7;margin-top:8px;font-weight:bold}
 
-input,textarea,select,button{font:inherit;width:100%;padding:11px;border-radius:9px}
+button:active{opacity:.7}
 
-input,textarea,select{color:white;background:#292945;border:1px solid #484866}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-textarea{min-height:90px}
+#thumbs{display:flex;gap:8px;overflow:auto;margin-top:10px}
 
-button{background:#8875ff;color:white;border:0;font-weight:650;margin-top:8px}
+.thumb{min-width:90px;width:90px}
 
-button.alt{background:#454560}
+.thumb img{width:90px;height:90px;object-fit:cover;border-radius:8px}
 
-button.danger{background:#7c354c}
+canvas{width:100%;max-height:65vh;object-fit:contain;background:#080811;border-radius:10px}
 
-button:disabled{opacity:.4}
+#status{color:#6ee7d8;overflow-wrap:anywhere;margin-top:10px}
 
-.row{display:flex;gap:7px}
+.lyric{display:flex;gap:5px;margin-top:6px}
 
-.row>*{flex:1;min-width:0}
+.lyric input:first-child{width:85px}
 
-canvas{width:100%;height:auto;display:block;background:#090914;border-radius:10px}
+.lyric button{width:45px}
 
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-
-.thumb{background:#292945;padding:5px;border-radius:8px;min-width:0}
-
-.thumb img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:5px}
-
-.thumb button{font-size:12px;padding:6px}
-
-small,.status{font-size:12px;color:#c7c3e6;overflow-wrap:anywhere}
-
-.status{white-space:pre-wrap}
-
-a{color:#c8bcff}
-
-hr{border:0;border-top:1px solid #383752;margin:14px 0}
+@media(max-width:500px){.grid{grid-template-columns:1fr}}
 
 </style>
 
@@ -80,7 +64,7 @@ hr{border:0;border-top:1px solid #383752;margin:14px 0}
 
 <h1>🎬 AI Video Studio</h1>
 
-<p>Studio dựng MV cá nhân · v1.0</p>
+Dựng MV từ ảnh, MP3 và lời bài hát ngay trên iPhone
 
 </header>
 
@@ -88,193 +72,133 @@ hr{border:0;border-top:1px solid #383752;margin:14px 0}
 
 <section class="panel">
 
-<h2>1. Dự án</h2>
-
-<label>Tên dự án</label>
-
-<input id="projectName" value="MV của tôi">
-
-<div class="row">
-
-<button id="saveProject">Lưu dự án</button>
-
-<button id="loadProject" class="alt">Mở dự án</button>
-
-</div>
-
-<button id="downloadProject" class="alt">Tải bản sao dự án JSON</button>
-
-<input id="projectFile" type="file" accept=".json,application/json" hidden>
-
-<p class="hint">Dự án có thể chứa ảnh và lời bài hát. Hãy giữ file JSON riêng để sao lưu.</p>
-
-</section>
-
-<section class="panel">
-
-<h2>2. Ảnh và thứ tự cảnh</h2>
+<h2>1. Ảnh và nhạc</h2>
 
 <label>Chọn nhiều ảnh</label>
 
-<input id="images" type="file" accept="image/*" multiple>
+<input id="files" type="file" accept="image/*" multiple>
 
-<div id="gallery" class="grid"></div>
+<div id="thumbs"></div>
 
-<p id="imageInfo" class="hint">Chưa có ảnh.</p>
+<label>Chọn nhạc MP3 / M4A / WAV</label>
 
-</section>
+<input id="music" type="file" accept="audio/*">
 
-<section class="panel">
-
-<h2>3. Nhạc và tiêu đề</h2>
-
-<label>Chọn nhạc nền</label>
-
-<input id="audioFile" type="file" accept="audio/*">
-
-<p id="audioInfo" class="hint">Chưa chọn nhạc.</p>
-
-<label>Tiêu đề video</label>
-
-<input id="title" value="Serenity Within" maxlength="100">
-
-<label>Vị trí tiêu đề</label>
-
-<select id="titlePosition">
-
-<option value="top">Phía trên</option>
-
-<option value="middle">Ở giữa</option>
-
-<option value="bottom">Phía dưới</option>
-
-</select>
+<audio id="audio" controls style="width:100%;margin-top:10px"></audio>
 
 </section>
 
 <section class="panel">
 
-<h2>4. Lời bài hát và phụ đề</h2>
+<h2>2. Thiết lập video</h2>
 
-<label>Mỗi dòng là một câu</label>
+<div class="grid">
 
-<textarea id="lyrics" placeholder="Dòng lời thứ nhất&#10;Dòng lời thứ hai&#10;Dòng lời thứ ba"></textarea>
-
-<label>Thời gian hiển thị mỗi dòng (giây)</label>
-
-<input id="lineSeconds" type="number" min="1" max="60" value="4">
-
-<p class="hint">Các dòng được hiển thị tuần tự theo thời gian. Đây chưa phải nhận diện giọng hát tự động.</p>
-
-</section>
-
-<section class="panel">
-
-<h2>5. Trợ lý lên ý tưởng MV</h2>
-
-<label>Mô tả bài hát hoặc nội dung MV</label>
-
-<textarea id="idea" placeholder="Ví dụ: bài hát nhẹ nhàng, phong cảnh biển lúc hoàng hôn..."></textarea>
-
-<div class="row">
-
-<button id="makeScript">Gợi ý kịch bản</button>
-
-<button id="copyScript" class="alt">Sao chép</button>
-
-</div>
-
-<textarea id="script" placeholder="Kịch bản gợi ý sẽ xuất hiện ở đây"></textarea>
-
-<p class="hint">Công cụ này tạo gợi ý theo mẫu ngay trên thiết bị, không gọi mô hình AI bên ngoài.</p>
-
-</section>
-
-<section class="panel">
-
-<h2>6. Thiết lập video</h2>
-
-<label>Tỷ lệ khung hình</label>
+<div><label>Tỉ lệ khung hình</label>
 
 <select id="ratio">
 
-<option value="916">9:16 — TikTok / Reels / Shorts</option>
+<option value="9:16">9:16 — TikTok</option>
 
-<option value="169">16:9 — YouTube</option>
+<option value="16:9">16:9 — YouTube</option>
 
-<option value="11">1:1 — Video vuông</option>
+<option value="1:1">1:1 — Vuông</option>
 
-</select>
+</select></div>
 
-<label>Thời lượng video (giây)</label>
-
-<input id="duration" type="number" min="5" max="300" value="30">
-
-<label>Hiệu ứng</label>
-
-<select id="effect">
-
-<option value="zoom">Zoom chậm</option>
-
-<option value="fade">Mờ chuyển cảnh</option>
-
-<option value="both">Zoom và mờ chuyển cảnh</option>
-
-<option value="none">Không hiệu ứng</option>
-
-</select>
-
-<label>Chất lượng</label>
+<div><label>Độ phân giải</label>
 
 <select id="quality">
 
-<option value="720">720p — nhẹ hơn</option>
+<option value="540">540p</option>
 
-<option value="540">540p — tiết kiệm bộ nhớ</option>
+<option value="720" selected>720p</option>
 
-</select>
+</select></div>
 
-</section>
+<div><label>Thời lượng</label>
 
-<section class="panel">
+<select id="duration">
 
-<h2>7. Xem trước</h2>
+<option value="audio">Theo độ dài nhạc</option>
 
-<canvas id="canvas" width="720" height="1280"></canvas>
+<option value="15">15 giây</option>
 
-<div class="row">
+<option value="30">30 giây</option>
 
-<button id="preview">▶ Xem trước</button>
+<option value="60">1 phút</option>
 
-<button id="stop" class="alt">Dừng</button>
+<option value="180">3 phút</option>
+
+<option value="300">5 phút</option>
+
+</select></div>
+
+<div><label>Hiệu ứng ảnh</label>
+
+<select id="motion">
+
+<option value="zoom">Zoom điện ảnh</option>
+
+<option value="float">Trôi nhẹ</option>
+
+<option value="pulse">Phóng to thu nhỏ</option>
+
+<option value="static">Đứng yên</option>
+
+</select></div>
 
 </div>
 
-<audio id="player" controls style="width:100%;margin-top:10px"></audio>
+<label>Tiêu đề MV</label>
 
-<p id="previewStatus" class="status">Chọn ảnh để bắt đầu.</p>
+<input id="title" value="My Music Video">
 
-</section>
+<label>Lời bài hát — mỗi câu một dòng</label>
 
-<section class="panel">
+<textarea id="lyrics" rows="5" placeholder="Dán lời bài hát tại đây"></textarea>
 
-<h2>8. Xuất video</h2>
+<button id="makeLyrics">Tạo mốc lời tự động</button>
 
-<button id="export">🎞️ Tạo video</button>
-
-<p id="exportStatus" class="status">Video thử nghiệm xử lý trên thiết bị.</p>
-
-<a id="videoLink" hidden>Tải video đã tạo</a>
-
-<p class="hint">Định dạng tùy khả năng Safari. Giữ trang mở khi xuất. Thử 5–15 giây trước khi làm video dài.</p>
+<div id="lyricList"></div>
 
 </section>
 
 <section class="panel">
 
-<h2>9. Giới hạn và AI nâng cao</h2>
+<h2>3. Xem trước MV</h2>
 
-<p class="hint">Phiên bản này hỗ trợ dựng slideshow từ ảnh, nhạc, tiêu đề và phụ đề. Chưa có AI sinh video, nhân vật hát hoặc đồng bộ khẩu hình. Các tính năng đó cần tích hợp mô hình hay dịch vụ riêng.</p>
+<canvas id="canvas" width="540" height="960"></canvas>
+
+<div class="grid">
+
+<button id="play">▶ Xem trước</button>
+
+<button id="pause">Ⅱ Tạm dừng</button>
+
+</div>
+
+<div id="status"></div>
+
+</section>
+
+<section class="panel">
+
+<h2>4. Timeline ảnh</h2>
+
+<p>Chạm vào ảnh để xem ảnh đó. Có thể đổi thứ tự bằng nút mũi tên.</p>
+
+<div id="timeline"></div>
+
+<button id="export">⬇ Xuất video</button>
+
+<a id="download" hidden>Tải video đã tạo</a>
+
+<p style="color:#c8c4e0;font-size:13px">
+
+Hiệu ứng chuyển động được tạo trong trình duyệt. Xuất video tùy thuộc khả năng hỗ trợ của Safari. Nhân vật hát nhép bằng AI cần tích hợp thêm dịch vụ AI riêng.
+
+</p>
 
 </section>
 
@@ -284,665 +208,333 @@ hr{border:0;border-top:1px solid #383752;margin:14px 0}
 
 const $=id=>document.getElementById(id);
 
-const canvas=$("canvas");
+const canvas=$('canvas'),ctx=canvas.getContext('2d');
 
-const ctx=canvas.getContext("2d");
+let images=[],lyrics=[],selected=0,playing=false,start=0,elapsed=0,raf=0;
 
-const player=$("player");
+let audioURL='',audioDuration=0;
 
-let scenes=[];
-
-let audioData=null;
-
-let previewing=false;
-
-let exporting=false;
-
-let raf=0;
-
-let previewStart=0;
-
-let audioCtx=null;
-
-let audioSource=null;
-
-let audioDest=null;
-
-let projectUrl=null;
-
-let exportTimer=null;
+function say(s){$('status').textContent=s}
 
 function duration(){
 
- return Math.max(5,Math.min(300,Number($("duration").value)||30));
+ return $('duration').value==='audio'
+
+ ?Math.max(1,audioDuration||30):Number($('duration').value);
 
 }
 
-function lines(){
+function dimensions(){
 
- return $("lyrics").value.split("\n").map(s=>s.trim()).filter(Boolean);
+ const q=Number($('quality').value),r=$('ratio').value;
 
-}
+ if(r==='16:9'){canvas.width=q*16/9;canvas.height=q}
 
-function resizeCanvas(){
+ else if(r==='1:1'){canvas.width=q;canvas.height=q}
 
- const ratio=$("ratio").value;
+ else{canvas.width=q*9/16;canvas.height=q}
 
- const h=Number($("quality").value);
-
- if(ratio==="916"){canvas.width=Math.round(h*9/16);canvas.height=h}
-
- else if(ratio==="169"){canvas.width=Math.round(h*16/9);canvas.height=h}
-
- else{canvas.width=h;canvas.height=h}
-
- draw(0);
+ draw(elapsed);
 
 }
 
-$("ratio").onchange=resizeCanvas;
+function draw(t=0,forceIndex=null){
 
-$("quality").onchange=resizeCanvas;
+ ctx.clearRect(0,0,canvas.width,canvas.height);
 
-$("images").onchange=async e=>{
+ ctx.fillStyle='#090912';ctx.fillRect(0,0,canvas.width,canvas.height);
 
- for(const f of [...e.target.files]){
+ if(!images.length){
 
-  if(!f.type.startsWith("image/"))continue;
+  ctx.fillStyle='#c4b5fd';ctx.textAlign='center';
 
-  const url=URL.createObjectURL(f);
+  ctx.font='bold 22px Arial';
 
-  try{
+  ctx.fillText('Chọn ảnh để bắt đầu',canvas.width/2,canvas.height/2);
 
-   const img=new Image();
-
-   await new Promise((resolve,reject)=>{
-
-    img.onload=resolve;img.onerror=reject;img.src=url;
-
-   });
-
-   scenes.push({name:f.name,url,img});
-
-  }catch(err){URL.revokeObjectURL(url)}
+  return;
 
  }
 
- renderGallery();
+ const d=duration(),idx=forceIndex===null?
 
- draw(0);
+ Math.min(images.length-1,Math.floor(t/(d/images.length))):forceIndex;
 
- e.target.value="";
+ const im=images[idx].img;
 
-};
+ const local=(t%(d/images.length))/(d/images.length);
 
-function renderGallery(){
+ let scale=1;
 
- const g=$("gallery");g.replaceChildren();
+ if($('motion').value==='zoom')scale=1+local*.18;
 
- scenes.forEach((s,i)=>{
+ if($('motion').value==='pulse')scale=1+Math.sin(local*Math.PI)*.12;
 
-  const box=document.createElement("div");box.className="thumb";
+ let iw=im.width,ih=im.height;
 
-  const im=document.createElement("img");im.src=s.url;im.alt=s.name;
+ let fit=Math.max(canvas.width/iw,canvas.height/ih)*scale;
 
-  const name=document.createElement("small");
+ let w=iw*fit,h=ih*fit;
 
-  name.textContent=(i+1)+". "+s.name;
+ let x=(canvas.width-w)/2,y=(canvas.height-h)/2;
 
-  const row=document.createElement("div");row.className="row";
+ if($('motion').value==='float')y+=Math.sin(t*1.2)*canvas.height*.025;
 
-  const up=document.createElement("button");up.textContent="↑";up.className="alt";
+ ctx.save();ctx.beginPath();ctx.rect(0,0,canvas.width,canvas.height);ctx.clip();
 
-  up.disabled=i===0;up.onclick=()=>moveScene(i,-1);
+ ctx.drawImage(im,x,y,w,h);ctx.restore();
 
-  const down=document.createElement("button");down.textContent="↓";down.className="alt";
-
-  down.disabled=i===scenes.length-1;down.onclick=()=>moveScene(i,1);
-
-  row.append(up,down);
-
-  const del=document.createElement("button");del.textContent="Xóa";del.className="danger";
-
-  del.onclick=()=>{URL.revokeObjectURL(s.url);scenes.splice(i,1);renderGallery();draw(0)};
-
-  box.append(im,name,row,del);g.append(box);
-
- });
-
- $("imageInfo").textContent="Số ảnh: "+scenes.length;
-
-}
-
-function moveScene(i,d){
-
- const j=i+d;if(j<0||j>=scenes.length)return;
-
- [scenes[i],scenes[j]]=[scenes[j],scenes[i]];
-
- renderGallery();draw(0);
-
-}
-
-$("audioFile").onchange=e=>{
-
- const f=e.target.files[0];if(!f)return;
-
- if(audioData?.url)URL.revokeObjectURL(audioData.url);
-
- audioData={name:f.name,file:f,url:URL.createObjectURL(f)};
-
- player.src=audioData.url;
-
- $("audioInfo").textContent="Đã chọn: "+f.name;
-
-};
-
-function draw(t){
-
- const w=canvas.width,h=canvas.height;
-
- ctx.fillStyle="#111126";ctx.fillRect(0,0,w,h);
-
- const d=duration();
-
- if(scenes.length){
-
-  const pos=Math.max(0,t)%d;
-
-  const slot=d/scenes.length;
-
-  const idx=Math.min(scenes.length-1,Math.floor(pos/slot));
-
-  const local=(pos-idx*slot)/slot;
-
-  const effect=$("effect").value;
-
-  const zoom=effect==="zoom"||effect==="both";
-
-  const fade=effect==="fade"||effect==="both";
-
-  function paint(scene,alpha,z){
-
-   const img=scene.img;
-
-   const scale=Math.max(w/img.width,h/img.height);
-
-   const factor=scale*(z?1+0.07*local:1);
-
-   const sw=w/factor,sh=h/factor;
-
-   ctx.save();ctx.globalAlpha=alpha;
-
-   ctx.drawImage(img,(img.width-sw)/2,(img.height-sh)/2,sw,sh,0,0,w,h);
-
-   ctx.restore();
-
-  }
-
-  if(fade&&local<0.18&&idx>0){
-
-   paint(scenes[idx-1],1,false);
-
-   paint(scenes[idx],local/0.18,zoom);
-
-  }else paint(scenes[idx],1,zoom);
-
-  ctx.fillStyle="rgba(0,0,0,.24)";ctx.fillRect(0,0,w,h);
-
- }else{
-
-  ctx.fillStyle="#b9aaff";ctx.textAlign="center";
-
-  ctx.font="bold 30px system-ui";
-
-  ctx.fillText("AI VIDEO STUDIO",w/2,h/2);
-
- }
-
- const title=$("title").value.trim();
-
- const pos=$("titlePosition").value;
-
- let ty=pos==="top"?h*.12:pos==="middle"?h*.5:h*.88;
-
- ctx.textAlign="center";ctx.textBaseline="middle";
+ const title=$('title').value;
 
  if(title){
 
-  ctx.font="bold "+Math.round(w*.055)+"px system-ui";
+  ctx.textAlign='center';ctx.fillStyle='white';
 
-  ctx.lineWidth=4;ctx.strokeStyle="#000";
+  ctx.shadowColor='#000';ctx.shadowBlur=8;
 
-  ctx.strokeText(title,w/2,ty,w*.88);
+  ctx.font='bold '+Math.max(18,canvas.width*.055)+'px Arial';
 
-  ctx.fillStyle="#fff";ctx.fillText(title,w/2,ty,w*.88);
+  ctx.fillText(title,canvas.width/2,canvas.height*.1,canvas.width*.9);
+
+  ctx.shadowBlur=0;
 
  }
 
- const ls=lines();
+ const line=[...lyrics].reverse().find(l=>t>=l.time);
 
- if(ls.length){
+ if(line){
 
-  const step=Math.max(1,Number($("lineSeconds").value)||4);
+  ctx.textAlign='center';ctx.fillStyle='#fff';
 
-  const index=Math.floor(Math.max(0,t)/step)%ls.length;
+  ctx.font='bold '+Math.max(18,canvas.width*.045)+'px Arial';
 
-  const text=ls[index];
+  ctx.shadowColor='#000';ctx.shadowBlur=6;
 
-  ctx.font="bold "+Math.round(w*.045)+"px system-ui";
+  ctx.fillText(line.text,canvas.width/2,canvas.height*.84,canvas.width*.9);
 
-  ctx.lineWidth=5;ctx.strokeStyle="#000";
-
-  ctx.strokeText(text,w/2,h*.8,w*.9);
-
-  ctx.fillStyle="#fff";ctx.fillText(text,w/2,h*.8,w*.9);
+  ctx.shadowBlur=0;
 
  }
 
 }
 
-function animate(){
+function makeThumbs(){
 
- if(!previewing)return;
+ $('thumbs').innerHTML='';$('timeline').innerHTML='';
 
- draw((performance.now()-previewStart)/1000);
+ images.forEach((o,i)=>{
 
- raf=requestAnimationFrame(animate);
+  const box=document.createElement('div');box.className='thumb';
 
-}
+  const im=document.createElement('img');im.src=o.url;
 
-function stopPreview(){
+  const label=document.createElement('div');label.textContent='Ảnh '+(i+1);
 
- previewing=false;cancelAnimationFrame(raf);
+  const choose=document.createElement('button');choose.textContent='Xem';
 
- if(!exporting)player.pause();
+  choose.onclick=()=>{selected=i;draw(elapsed,i)};
 
-}
+  const left=document.createElement('button');left.textContent='←';
 
-$("preview").onclick=async()=>{
+  left.onclick=()=>move(i,-1);
 
- if(!scenes.length){$("previewStatus").textContent="Hãy chọn ảnh trước.";return}
+  const right=document.createElement('button');right.textContent='→';
 
- stopPreview();previewing=true;previewStart=performance.now();animate();
+  right.onclick=()=>move(i,1);
 
- if(audioData){
+  const del=document.createElement('button');del.textContent='X';
 
-  player.currentTime=0;
+  del.onclick=()=>{images.splice(i,1);makeThumbs();draw(elapsed)};
 
-  try{await player.play()}catch(e){
+  box.append(im,label,choose,left,right,del);
 
-   $("previewStatus").textContent="Nhấn nút phát trên trình phát nhạc nếu cần.";
+  $('thumbs').append(box);
 
-  }
+  const clip=document.createElement('button');
 
- }
+  clip.textContent='Ảnh '+(i+1);
 
-};
+  clip.onclick=()=>{selected=i;draw(elapsed,i)};
 
-$("stop").onclick=()=>{stopPreview();player.pause();draw(0)};
-
-$("title").oninput=()=>draw(0);
-
-$("titlePosition").onchange=()=>draw(0);
-
-$("lyrics").oninput=()=>draw(0);
-
-$("lineSeconds").oninput=()=>draw(0);
-
-$("effect").onchange=()=>draw(0);
-
-$("duration").onchange=()=>draw(0);
-
-function canvasBlob(){
-
- return new Promise((resolve,reject)=>{
-
-  canvas.toBlob(b=>b?resolve(b):reject(new Error("Không tạo được ảnh xem trước")),"image/png");
+  $('timeline').append(clip);
 
  });
 
 }
 
-async function sceneToData(scene){
+function move(i,delta){
 
- const b=await canvasBlob();
+ const j=i+delta;if(j<0||j>=images.length)return;
 
- return b;
+ [images[i],images[j]]=[images[j],images[i]];
+
+ makeThumbs();draw(elapsed);
 
 }
 
-async function saveProject(){
+$('files').onchange=async e=>{
 
- const data={version:1,name:$("projectName").value,title:$("title").value,
+ for(const f of e.target.files){
 
- titlePosition:$("titlePosition").value,lyrics:$("lyrics").value,
+  if(!f.type.startsWith('image/'))continue;
 
- lineSeconds:$("lineSeconds").value,idea:$("idea").value,script:$("script").value,
+  const url=URL.createObjectURL(f);
 
- ratio:$("ratio").value,duration:$("duration").value,effect:$("effect").value,
+  const img=new Image();
 
- quality:$("quality").value,scenes:[],audio:null};
+  await new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;img.src=url});
 
- try{
-
-  for(const s of scenes){
-
-   const response=await fetch(s.url);
-
-   const blob=await response.blob();
-
-   data.scenes.push({name:s.name,data:await blobToData(blob)});
-
-  }
-
-  if(audioData){
-
-   const response=await fetch(audioData.url);
-
-   data.audio={name:audioData.name,data:await blobToData(await response.blob())};
-
-  }
-
-  localStorage.setItem("aivs-project",JSON.stringify(data));
-
-  $("exportStatus").textContent="Đã lưu dự án trên thiết bị này.";
-
- }catch(e){
-
-  $("exportStatus").textContent="Không lưu được dự án: "+e.message+". Hãy thử tải bản sao JSON.";
+  if(img.width)images.push({img,url,name:f.name});
 
  }
 
-}
-
-function blobToData(blob){
-
- return new Promise((resolve,reject)=>{
-
-  const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob);
-
- });
-
-}
-
-function dataToBlob(url){
-
- const [head,body]=url.split(",");
-
- const type=(head.match(/data:(.*?);base64/)||[])[1]||"application/octet-stream";
-
- const binary=atob(body),bytes=new Uint8Array(binary.length);
-
- for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-
- return new Blob([bytes],{type});
-
-}
-
-function loadData(data){
-
- stopPreview();
-
- scenes.forEach(s=>URL.revokeObjectURL(s.url));scenes=[];
-
- if(audioData?.url)URL.revokeObjectURL(audioData.url);
-
- audioData=null;
-
- $("projectName").value=data.name||"MV của tôi";
-
- $("title").value=data.title||"";
-
- $("titlePosition").value=data.titlePosition||"top";
-
- $("lyrics").value=data.lyrics||"";
-
- $("lineSeconds").value=data.lineSeconds||4;
-
- $("idea").value=data.idea||"";
-
- $("script").value=data.script||"";
-
- $("ratio").value=data.ratio||"916";
-
- $("duration").value=data.duration||30;
-
- $("effect").value=data.effect||"zoom";
-
- $("quality").value=data.quality||"720";
-
- resizeCanvas();
-
- for(const s of data.scenes||[]){
-
-  const blob=dataToBlob(s.data),url=URL.createObjectURL(blob),img=new Image();
-
-  img.src=url;scenes.push({name:s.name,url,img});
-
- }
-
- const wait=Promise.all(scenes.map(s=>new Promise(resolve=>{
-
-  if(s.img.complete)return resolve();
-
-  s.img.onload=resolve;s.img.onerror=resolve;
-
- })));
-
- wait.then(()=>{renderGallery();draw(0)});
-
- if(data.audio){
-
-  const blob=dataToBlob(data.audio.data),url=URL.createObjectURL(blob);
-
-  audioData={name:data.audio.name,url,file:null};player.src=url;
-
-  $("audioInfo").textContent="Đã nạp: "+data.audio.name;
-
- }
-
-}
-
-$("saveProject").onclick=saveProject;
-
-$("loadProject").onclick=()=>{
-
- const saved=localStorage.getItem("aivs-project");
-
- if(!saved){$("exportStatus").textContent="Chưa có dự án lưu trên thiết bị.";return}
-
- try{loadData(JSON.parse(saved));$("exportStatus").textContent="Đã mở dự án."}
-
- catch(e){$("exportStatus").textContent="Không đọc được dự án."}
+ makeThumbs();draw(elapsed);say('Đã thêm '+images.length+' ảnh.');
 
 };
 
-$("downloadProject").onclick=async()=>{
-
- await saveProject();
-
- const saved=localStorage.getItem("aivs-project");if(!saved)return;
-
- const blob=new Blob([saved],{type:"application/json"});
-
- const url=URL.createObjectURL(blob);
-
- const a=document.createElement("a");a.href=url;
-
- a.download="ai-video-studio-project.json";a.click();
-
- setTimeout(()=>URL.revokeObjectURL(url),3000);
-
-};
-
-$("projectFile").onchange=async e=>{
+$('music').onchange=e=>{
 
  const f=e.target.files[0];if(!f)return;
 
- try{loadData(JSON.parse(await f.text()));$("exportStatus").textContent="Đã mở file dự án."}
+ if(audioURL)URL.revokeObjectURL(audioURL);
 
- catch(err){$("exportStatus").textContent="File dự án không hợp lệ."}
+ audioURL=URL.createObjectURL(f);$('audio').src=audioURL;
 
- e.target.value="";
-
-};
-
-$("makeScript").onclick=()=>{
-
- const idea=$("idea").value.trim()||"một bài hát giàu cảm xúc";
-
- const n=Math.max(1,scenes.length);
-
- $("script").value="Ý tưởng MV: "+idea+"\n\n"+
-
- "Cảnh 1: Mở đầu bằng hình ảnh gây chú ý, giới thiệu không khí bài hát.\n"+
-
- "Cảnh 2: Dùng ảnh có cảm xúc phù hợp với phần lời đầu.\n"+
-
- "Cảnh 3: Tăng nhịp hình ảnh ở đoạn điệp khúc.\n"+
-
- "Cảnh 4: Chuyển cảnh mềm, giữ nhân vật hoặc chủ thể nhất quán.\n"+
-
- "Cảnh cuối: Hiện tiêu đề bài hát và kết thúc nhẹ nhàng.\n\n"+
-
- "Số ảnh hiện có: "+n+".\n"+
-
- "Lưu ý: Đây là kịch bản gợi ý theo mẫu, chưa được AI bên ngoài tạo.";
+ $('audio').onloadedmetadata=()=>{audioDuration=$('audio').duration; say('Đã tải nhạc nền.')};
 
 };
 
-$("copyScript").onclick=async()=>{
+$('makeLyrics').onclick=()=>{
 
- try{
+ lyrics=$('lyrics').value.split('\n').map(s=>s.trim()).filter(Boolean)
 
-  await navigator.clipboard.writeText($("script").value);
+ .map((text,i)=>({time:i*duration()/Math.max(1,$('lyrics').value.split('\n').filter(s=>s.trim()).length),text}));
 
-  $("exportStatus").textContent="Đã sao chép kịch bản.";
+ $('lyricList').innerHTML='';
 
- }catch(e){$("exportStatus").textContent="Không sao chép được. Bạn hãy nhấn giữ nội dung kịch bản để sao chép."}
+ lyrics.forEach((l,i)=>{
+
+  const row=document.createElement('div');row.className='lyric';
+
+  const time=document.createElement('input');time.type='number';time.min=0;time.step='.1';time.value=l.time;
+
+  time.onchange=()=>{lyrics[i].time=Math.max(0,Number(time.value)||0)};
+
+  const txt=document.createElement('input');txt.value=l.text;
+
+  txt.onchange=()=>lyrics[i].text=txt.value;
+
+  row.append(time,txt);$('lyricList').append(row);
+
+ });
+
+ draw(elapsed);say('Đã tạo mốc lời bài hát.');
 
 };
 
-$("export").onclick=async()=>{
+function frame(now){
 
- if(exporting)return;
+ if(!playing)return;
 
- if(!scenes.length){$("exportStatus").textContent="Chọn ảnh trước.";return}
+ elapsed=(now-start)/1000;
 
- if(!audioData){$("exportStatus").textContent="Chọn nhạc trước.";return}
+ if(elapsed>=duration()){
 
- if(!window.MediaRecorder||!canvas.captureStream){
-
-  $("exportStatus").textContent="Safari không hỗ trợ xuất video ở cấu hình hiện tại.";return;
+  elapsed=0;playing=false;$('audio').pause();draw(0);say('Đã phát hết video xem trước.');return;
 
  }
 
- const types=["video/mp4;codecs=h264,aac","video/mp4","video/webm;codecs=vp9,opus","video/webm"];
+ draw(elapsed);raf=requestAnimationFrame(frame);
 
- const mime=types.find(t=>MediaRecorder.isTypeSupported(t));
+}
 
- if(!mime){$("exportStatus").textContent="Không có định dạng xuất tương thích.";return}
+$('play').onclick=()=>{
 
- let stream=null,recorder=null;
+ if(!images.length){say('Bạn hãy chọn ảnh trước nhé.');return}
 
- const chunks=[];
+ playing=false;cancelAnimationFrame(raf);
+
+ start=performance.now()-elapsed*1000;playing=true;
+
+ if(audioURL){$('audio').currentTime=elapsed;$('audio').play().catch(()=>{})}
+
+ raf=requestAnimationFrame(frame);say('Đang xem trước…');
+
+};
+
+$('pause').onclick=()=>{
+
+ playing=false;cancelAnimationFrame(raf);$('audio').pause();say('Đã tạm dừng.');
+
+};
+
+$('ratio').onchange=dimensions;$('quality').onchange=dimensions;
+
+['duration','motion','title'].forEach(id=>$(id).onchange=()=>draw(elapsed));
+
+$('export').onclick=async()=>{
+
+ if(!images.length){say('Hãy chọn ít nhất một ảnh.');return}
+
+ if(!canvas.captureStream||!window.MediaRecorder){
+
+  say('Safari hiện tại chưa hỗ trợ xuất video trực tiếp. Hãy dùng trình duyệt hoặc thiết bị hỗ trợ MediaRecorder.');
+
+  return;
+
+ }
+
+ let mime=['video/mp4','video/webm'].find(t=>MediaRecorder.isTypeSupported(t));
+
+ if(!mime){say('Không tìm thấy định dạng video được hỗ trợ trên trình duyệt này.');return}
+
+ playing=false;cancelAnimationFrame(raf);
+
+ const stream=canvas.captureStream(24),chunks=[];
+
+ let recorder;
 
  try{
-
-  exporting=true;$("export").disabled=true;
-
-  const AC=window.AudioContext||window.webkitAudioContext;
-
-  if(!AC)throw new Error("Không hỗ trợ xử lý âm thanh");
-
-  if(!audioCtx){
-
-   audioCtx=new AC();
-
-   audioSource=audioCtx.createMediaElementSource(player);
-
-   audioDest=audioCtx.createMediaStreamDestination();
-
-   audioSource.connect(audioDest);audioSource.connect(audioCtx.destination);
-
-  }
-
-  await audioCtx.resume();
-
-  stream=new MediaStream([...canvas.captureStream(24).getVideoTracks(),
-
-    ...audioDest.stream.getAudioTracks()]);
 
   recorder=new MediaRecorder(stream,{mimeType:mime});
 
   recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
 
-  recorder.onerror=()=>{
-
-   $("exportStatus").textContent="Trình ghi video gặp lỗi. Hãy thử video ngắn hơn.";
-
-  };
-
   recorder.onstop=()=>{
 
-   const blob=new Blob(chunks,{type:mime});
+   const blob=new Blob(chunks,{type:mime}),url=URL.createObjectURL(blob);
 
-   const url=URL.createObjectURL(blob);
+   $('download').href=url;$('download').download='ai-video-studio.'+(mime.includes('mp4')?'mp4':'webm');
 
-   const a=$("videoLink");
+   $('download').textContent='Tải video vừa tạo';$('download').hidden=false;
 
-   a.href=url;
-
-   a.download="ai-video-studio."+(mime.includes("mp4")?"mp4":"webm");
-
-   a.textContent="⬇ Tải video về iPhone";a.hidden=false;
-
-   $("exportStatus").textContent="Hoàn tất: "+(blob.size/1048576).toFixed(1)+" MB";
-
-   stream.getTracks().forEach(t=>t.stop());
-
-   exporting=false;$("export").disabled=false;
-
-   player.pause();player.loop=false;
+   say('Đã tạo video. Chạm vào liên kết tải video.');
 
   };
 
-  $("videoLink").hidden=true;
+  recorder.start();
 
-  $("exportStatus").textContent="Đang xuất video. Hãy giữ Safari mở.";
+  const end=performance.now()+duration()*1000;
 
-  recorder.start(500);
+  const render=now=>{
 
-  stopPreview();previewing=true;previewStart=performance.now();animate();
+   const t=(now-(end-duration()*1000))/1000;
 
-  player.loop=true;player.currentTime=0;
+   draw(t);
 
-  await player.play();
+   if(now<end)requestAnimationFrame(render);
 
-  exportTimer=setTimeout(()=>{
+   else recorder.stop();
 
-   previewing=false;cancelAnimationFrame(raf);player.pause();
+  };
 
-   if(recorder.state!=="inactive")recorder.stop();
+  requestAnimationFrame(render);say('Đang tạo video. Giữ Safari mở đến khi hoàn tất.');
 
-  },duration()*1000);
-
- }catch(e){
-
-  clearTimeout(exportTimer);
-
-  if(stream)stream.getTracks().forEach(t=>t.stop());
-
-  exporting=false;$("export").disabled=false;player.pause();player.loop=false;
-
-  $("exportStatus").textContent="Xuất video thất bại: "+e.message;
-
- }
+ }catch(e){say('Không thể xuất video: '+e.message)}
 
 };
 
-resizeCanvas();
+dimensions();draw(0);
 
 </script>
 
