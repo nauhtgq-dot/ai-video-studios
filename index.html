@@ -12,7 +12,7 @@
 
 <meta name="theme-color" content="#101020">
 
-<title>AI Video Studio</title>
+<title>AI Video Studio v0.2</title>
 
 <style>
 
@@ -22,29 +22,39 @@ body{margin:0;background:#101020;color:#fff;font-family:system-ui,sans-serif}
 
 header{padding:22px 18px;background:#191933}
 
-h1{font-size:25px;margin:0 0 6px}
+h1{font-size:25px;margin:0}
 
 p{color:#c3c3dc;font-size:14px;line-height:1.5}
 
-main{padding:16px;max-width:650px;margin:auto}
+main{padding:15px;max-width:680px;margin:auto}
 
-.panel{background:#1b1b35;padding:16px;border-radius:16px;margin-bottom:15px}
+.panel{background:#1b1b35;padding:15px;border-radius:16px;margin-bottom:15px}
 
-label{display:block;margin:12px 0 7px;font-size:14px}
+label{display:block;font-size:14px;margin:12px 0 7px}
 
-input,button{width:100%;padding:12px;border-radius:10px}
+input,textarea,select,button{font:inherit;width:100%;padding:11px;border-radius:10px}
 
-input{background:#292945;color:white;border:1px solid #484866}
+input,textarea,select{background:#292945;color:white;border:1px solid #484866}
 
-button{border:0;background:#8875ff;color:white;font-weight:700;font-size:16px;margin-top:10px}
+textarea{min-height:110px;resize:vertical}
 
-button:disabled{opacity:.5}
+button{background:#8875ff;color:white;border:0;font-weight:700;margin-top:9px}
+
+button.secondary{background:#454560}
+
+button:disabled{opacity:.45}
 
 canvas{width:100%;display:block;background:#080812;border-radius:12px}
 
-#status{white-space:pre-wrap}
-
 .small{font-size:12px;color:#aaaad0}
+
+.row{display:flex;gap:8px}
+
+.row button{flex:1}
+
+#status{white-space:pre-wrap;overflow-wrap:anywhere}
+
+a{color:#c8bcff}
 
 </style>
 
@@ -54,63 +64,117 @@ canvas{width:100%;display:block;background:#080812;border-radius:12px}
 
 <header>
 
-  <h1>🎬 AI Video Studio</h1>
+<h1>🎬 AI Video Studio</h1>
 
-  <p>Tạo video ảnh + nhạc ngay trên iPhone</p>
+<p>v0.2 · Slideshow · Lời bài hát · Hiệu ứng</p>
 
 </header>
 
 <main>
 
-  <section class="panel">
+<section class="panel">
 
-    <h3>① Chọn nội dung</h3>
+<h3>① Ảnh cho MV</h3>
 
-    <label>Ảnh nền</label>
+<label>Chọn nhiều ảnh cùng lúc</label>
 
-    <input id="photo" type="file" accept="image/*">
+<input id="photos" type="file" accept="image/*" multiple>
 
-    <label>Nhạc MP3 / audio</label>
+<p id="photoInfo" class="small">Chưa chọn ảnh.</p>
 
-    <input id="music" type="file" accept="audio/*">
+<label>Ảnh đang chọn để sắp xếp</label>
 
-    <label>Chữ hiển thị trên video</label>
+<select id="photoOrder"><option value="">Chưa có ảnh</option></select>
 
-    <input id="caption" value="Serenity Within" maxlength="100">
+<div class="row">
 
-    <label>Thời lượng thử (giây)</label>
+<button id="up" class="secondary">↑ Lên</button>
 
-    <input id="duration" type="number" min="5" max="60" value="15">
+<button id="down" class="secondary">↓ Xuống</button>
 
-    <p class="small">Bản thử giới hạn 60 giây để tránh quá tải iPhone.</p>
+</div>
 
-  </section>
+</section>
 
-  <section class="panel">
+<section class="panel">
 
-    <h3>② Xem trước</h3>
+<h3>② Nhạc và lời bài hát</h3>
 
-    <canvas id="screen" width="720" height="1280"></canvas>
+<label>Chọn file nhạc</label>
 
-    <button id="preview">▶ Xem trước</button>
+<input id="music" type="file" accept="audio/*">
 
-    <button id="stop" style="background:#454560">Dừng xem trước</button>
+<label>Tiêu đề MV</label>
 
-  </section>
+<input id="title" value="Serenity Within" maxlength="100">
 
-  <section class="panel">
+<label>Lời bài hát (mỗi dòng hiển thị lần lượt)</label>
 
-    <h3>③ Tạo video</h3>
+<textarea id="lyrics" placeholder="Dòng lời bài hát thứ nhất&#10;Dòng lời bài hát thứ hai&#10;Dòng lời bài hát thứ ba"></textarea>
 
-    <button id="export">🎞️ Xuất video thử</button>
+<p class="small">Lời được chia đều theo thời gian video, không tự nhận diện giọng hát.</p>
 
-    <p id="status">Hãy chọn ảnh và nhạc để bắt đầu.</p>
+</section>
 
-    <a id="download" hidden style="color:#bcb2ff">Tải video vừa tạo</a>
+<section class="panel">
 
-    <p class="small">Video được xử lý trên thiết bị. Định dạng xuất tùy khả năng Safari; hãy thử đoạn ngắn trước.</p>
+<h3>③ Khung hình và hiệu ứng</h3>
 
-  </section>
+<label>Tỷ lệ video</label>
+
+<select id="ratio">
+
+<option value="916">9:16 — TikTok, Reels, Shorts</option>
+
+<option value="169">16:9 — YouTube, màn hình ngang</option>
+
+<option value="11">1:1 — Video vuông</option>
+
+</select>
+
+<label>Chuyển cảnh</label>
+
+<select id="transition">
+
+<option value="fade">Mờ dần giữa ảnh</option>
+
+<option value="cut">Cắt trực tiếp</option>
+
+</select>
+
+<label>Thời lượng video thử (giây)</label>
+
+<input id="duration" type="number" min="5" max="60" value="15">
+
+<p class="small">Bản thử tối đa 60 giây để hạn chế tải cho iPhone.</p>
+
+</section>
+
+<section class="panel">
+
+<h3>④ Xem trước MV</h3>
+
+<canvas id="screen" width="720" height="1280"></canvas>
+
+<button id="preview">▶ Xem trước</button>
+
+<button id="stop" class="secondary">Dừng</button>
+
+</section>
+
+<section class="panel">
+
+<h3>⑤ Xuất video</h3>
+
+<button id="export">🎞️ Tạo video thử</button>
+
+<p id="status">Chọn ảnh và nhạc để bắt đầu.</p>
+
+<a id="download" hidden>Tải video về iPhone</a>
+
+<p class="small">Hãy giữ Safari mở đến khi hoàn tất. Định dạng xuất tùy khả năng trình duyệt.</p>
+
+</section>
 
 </main>
 
@@ -118,223 +182,415 @@ canvas{width:100%;display:block;background:#080812;border-radius:12px}
 
 const $=id=>document.getElementById(id);
 
-const canvas=$("screen"),ctx=canvas.getContext("2d");
+const canvas=$("screen");
 
-let photo=null,raf=0,started=0,playing=false;
+const ctx=canvas.getContext("2d");
 
-let audio=null,audioCtx=null,source=null,dest=null;
+const audio=new Audio();
 
-$("photo").onchange=e=>{
+audio.preload="auto";
 
- const f=e.target.files[0]; if(!f)return;
+let photos=[],urls=[],raf=0,playing=false,startAt=0;
 
- const url=URL.createObjectURL(f);
+let audioCtx=null,source=null,dest=null;
 
- const img=new Image();
+let exporting=false;
 
- img.onload=()=>{photo=img;draw(0);URL.revokeObjectURL(url)};
+$("photos").addEventListener("change",async e=>{
 
- img.src=url;
+  stopPreview();
 
-};
+  photos=[];urls=[];
+
+  const files=[...e.target.files].filter(f=>f.type.startsWith("image/")).slice(0,30);
+
+  for(const file of files){
+
+    const url=URL.createObjectURL(file);
+
+    try{
+
+      const img=new Image();
+
+      await new Promise((resolve,reject)=>{
+
+        img.onload=resolve;img.onerror=reject;img.src=url;
+
+      });
+
+      photos.push({img,name:file.name});
+
+      urls.push(url);
+
+    }catch(err){URL.revokeObjectURL(url)}
+
+  }
+
+  updateOrder();
+
+  $("photoInfo").textContent="Đã tải "+photos.length+" ảnh.";
+
+  draw(0);
+
+});
+
+function updateOrder(selected=0){
+
+  const s=$("photoOrder");
+
+  s.innerHTML="";
+
+  photos.forEach((p,i)=>{
+
+    const o=document.createElement("option");
+
+    o.value=String(i);
+
+    o.textContent=(i+1)+". "+p.name;
+
+    s.appendChild(o);
+
+  });
+
+  if(photos.length)s.value=String(Math.min(selected,photos.length-1));
+
+  $("up").disabled=selected<=0||!photos.length;
+
+  $("down").disabled=selected>=photos.length-1||!photos.length;
+
+}
+
+$("photoOrder").onchange=()=>updateOrder(Number($("photoOrder").value)||0);
+
+function movePhoto(delta){
+
+  const i=Number($("photoOrder").value);
+
+  const j=i+delta;
+
+  if(!photos.length||j<0||j>=photos.length)return;
+
+  [photos[i],photos[j]]=[photos[j],photos[i]];
+
+  updateOrder(j);draw(0);
+
+}
+
+$("up").onclick=()=>movePhoto(-1);
+
+$("down").onclick=()=>movePhoto(1);
 
 $("music").onchange=e=>{
 
- const f=e.target.files[0];if(!f)return;
+  const file=e.target.files[0];
 
- if(audio){audio.pause();URL.revokeObjectURL(audio.src)}
+  if(!file)return;
 
- audio=new Audio(URL.createObjectURL(f));
+  audio.pause();
 
- audio.preload="auto";
+  audio.src=URL.createObjectURL(file);
 
- $("status").textContent="Đã nạp nhạc. Sẵn sàng xem trước.";
+  audio.load();
+
+  $("status").textContent="Đã chọn nhạc: "+file.name;
 
 };
 
-function draw(t){
+$("title").oninput=()=>draw(0);
 
- const w=canvas.width,h=canvas.height;
+$("lyrics").oninput=()=>draw(0);
 
- ctx.fillStyle="#111126";ctx.fillRect(0,0,w,h);
+$("ratio").onchange=()=>{
 
- if(photo){
+  const r=$("ratio").value;
 
-   const scale=Math.max(w/photo.width,h/photo.height);
+  if(r==="916"){canvas.width=720;canvas.height=1280}
 
-   const zoom=1+0.035*(0.5+0.5*Math.sin(t/1800));
+  else if(r==="169"){canvas.width=1280;canvas.height=720}
 
-   const sw=w/(scale*zoom),sh=h/(scale*zoom);
+  else{canvas.width=900;canvas.height=900}
 
-   const sx=(photo.width-sw)/2,sy=(photo.height-sh)/2;
+  draw(0);
 
-   ctx.drawImage(photo,sx,sy,sw,sh,0,0,w,h);
+};
 
-   ctx.fillStyle="rgba(0,0,15,.28)";ctx.fillRect(0,0,w,h);
+function fitImage(img,t,alpha=1){
 
- }else{
+  if(!img)return;
 
-   ctx.fillStyle="#b9aaff";ctx.textAlign="center";
+  const w=canvas.width,h=canvas.height;
 
-   ctx.font="bold 42px system-ui";
+  const scale=Math.max(w/img.width,h/img.height);
 
-   ctx.fillText("AI VIDEO STUDIO",w/2,h/2);
+  const zoom=1+0.07*(t%1);
 
-   ctx.font="26px system-ui";ctx.fillText("Chọn ảnh để bắt đầu",w/2,h/2+55);
+  const sw=w/(scale*zoom),sh=h/(scale*zoom);
 
- }
+  const drift=(t%1)*0.025;
 
- const text=$("caption").value;
+  const sx=(img.width-sw)/2+drift*img.width;
 
- if(text){
+  const sy=(img.height-sh)/2;
 
-   ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.save();ctx.globalAlpha=alpha;
 
-   ctx.font="bold 42px system-ui";
+  ctx.drawImage(img,sx,sy,sw,sh,0,0,w,h);
 
-   ctx.lineWidth=4;ctx.strokeStyle="rgba(0,0,0,.8)";
+  ctx.restore();
 
-   ctx.strokeText(text,w/2,h*.78,w-70);
+}
 
-   ctx.fillStyle="#fff";ctx.fillText(text,w/2,h*.78,w-70);
+function draw(seconds){
 
- }
+  const w=canvas.width,h=canvas.height;
+
+  ctx.fillStyle="#111126";ctx.fillRect(0,0,w,h);
+
+  const duration=Math.max(5,Math.min(60,Number($("duration").value)||15));
+
+  if(photos.length){
+
+    const slot=duration/photos.length;
+
+    const pos=Math.max(0,seconds)%duration;
+
+    const idx=Math.min(photos.length-1,Math.floor(pos/slot));
+
+    const local=(pos-idx*slot)/slot;
+
+    const fade=$("transition").value==="fade"?Math.min(1,local/0.16):1;
+
+    fitImage(photos[idx].img,local,fade);
+
+    if(fade<1&&photos.length>1){
+
+      const next=(idx+1)%photos.length;
+
+      fitImage(photos[next].img,local,1-fade);
+
+    }
+
+    ctx.fillStyle="rgba(0,0,0,.25)";ctx.fillRect(0,0,w,h);
+
+  }else{
+
+    ctx.fillStyle="#b9aaff";ctx.textAlign="center";
+
+    ctx.font="bold 42px system-ui";
+
+    ctx.fillText("AI VIDEO STUDIO",w/2,h/2);
+
+  }
+
+  const title=$("title").value.trim();
+
+  ctx.textAlign="center";ctx.textBaseline="middle";
+
+  if(title){
+
+    ctx.font="bold "+Math.round(w*.055)+"px system-ui";
+
+    ctx.lineWidth=4;ctx.strokeStyle="#000";
+
+    ctx.strokeText(title,w/2,h*.13,w*.88);
+
+    ctx.fillStyle="#fff";ctx.fillText(title,w/2,h*.13,w*.88);
+
+  }
+
+  const lines=$("lyrics").value.split("\n").map(s=>s.trim()).filter(Boolean);
+
+  if(lines.length){
+
+    const duration2=Math.max(5,Math.min(60,Number($("duration").value)||15));
+
+    const lineIndex=Math.min(lines.length-1,Math.floor((Math.max(0,seconds)%duration2)/duration2*lines.length));
+
+    const line=lines[lineIndex];
+
+    ctx.font="bold "+Math.round(w*.045)+"px system-ui";
+
+    ctx.lineWidth=5;ctx.strokeStyle="rgba(0,0,0,.9)";
+
+    ctx.strokeText(line,w/2,h*.79,w*.88);
+
+    ctx.fillStyle="#fff";ctx.fillText(line,w/2,h*.79,w*.88);
+
+  }
 
 }
 
 function animate(){
 
- if(!playing)return;
+  if(!playing)return;
 
- draw(performance.now()-started);
+  const t=(performance.now()-startAt)/1000;
 
- raf=requestAnimationFrame(animate);
+  draw(t);
+
+  raf=requestAnimationFrame(animate);
 
 }
 
-$("caption").oninput=()=>draw(0);
+function stopPreview(){
 
-$("preview").onclick=()=>{
+  playing=false;cancelAnimationFrame(raf);
 
- playing=true;started=performance.now();animate();
+  if(!exporting)audio.pause();
 
- if(audio){audio.currentTime=0;audio.play().catch(()=>{});}
+  draw(0);
+
+}
+
+$("preview").onclick=async()=>{
+
+  if(!photos.length){$("status").textContent="Bạn hãy chọn ít nhất một ảnh.";return}
+
+  stopPreview();
+
+  playing=true;startAt=performance.now();animate();
+
+  if(audio.src){
+
+    audio.currentTime=0;
+
+    try{await audio.play()}catch(err){
+
+      $("status").textContent="Không phát được nhạc. Hãy nhấn Xem trước lần nữa.";
+
+    }
+
+  }
 
 };
 
 $("stop").onclick=()=>{
 
- playing=false;cancelAnimationFrame(raf);
+  stopPreview();
 
- if(audio)audio.pause();
-
- draw(0);
+  if(!exporting)audio.pause();
 
 };
 
 $("export").onclick=async()=>{
 
- if(!photo){$("status").textContent="Vui lòng chọn ảnh trước.";return;}
+  if(exporting)return;
 
- if(!audio){$("status").textContent="Vui lòng chọn nhạc trước.";return;}
+  if(!photos.length){$("status").textContent="Vui lòng chọn ảnh trước.";return}
 
- if(!window.MediaRecorder||!canvas.captureStream){
+  if(!audio.src){$("status").textContent="Vui lòng chọn file nhạc trước.";return}
 
-   $("status").textContent="Safari hiện không hỗ trợ xuất video ở cấu hình này. Bạn vẫn có thể xem trước.";
+  if(!window.MediaRecorder||!canvas.captureStream){
 
-   return;
+    $("status").textContent="Safari không hỗ trợ xuất video trong cấu hình này.";
 
- }
+    return;
 
- const seconds=Math.max(5,Math.min(60,Number($("duration").value)||15));
+  }
 
- let stream,recorder,chunks=[];
+  const seconds=Math.max(5,Math.min(60,Number($("duration").value)||15));
 
- try{
+  const types=["video/mp4;codecs=h264,aac","video/mp4","video/webm;codecs=vp9,opus","video/webm"];
 
-   const types=["video/mp4;codecs=h264,aac","video/mp4","video/webm;codecs=vp9,opus","video/webm"];
+  const mime=types.find(t=>MediaRecorder.isTypeSupported(t));
 
-   const mime=types.find(t=>MediaRecorder.isTypeSupported(t));
+  if(!mime){$("status").textContent="Không tìm được định dạng video tương thích.";return}
 
-   if(!mime){$("status").textContent="Không tìm thấy định dạng video được hỗ trợ trên trình duyệt này.";return;}
+  let stream=null,recorder=null;
 
-   if(!audioCtx){
+  const chunks=[];
 
-     audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  try{
 
-     source=audioCtx.createMediaElementSource(audio);
+    exporting=true;$("export").disabled=true;
 
-     dest=audioCtx.createMediaStreamDestination();
+    if(!audioCtx){
 
-     source.connect(dest);source.connect(audioCtx.destination);
+      const AC=window.AudioContext||window.webkitAudioContext;
 
-   }
+      if(!AC)throw new Error("Trình duyệt không hỗ trợ xử lý âm thanh");
 
-   await audioCtx.resume();
+      audioCtx=new AC();
 
-   const videoStream=canvas.captureStream(30);
+      source=audioCtx.createMediaElementSource(audio);
 
-   stream=new MediaStream([
+      dest=audioCtx.createMediaStreamDestination();
 
-     ...videoStream.getVideoTracks(),
+      source.connect(dest);
 
-     ...dest.stream.getAudioTracks()
+      source.connect(audioCtx.destination);
 
-   ]);
+    }
 
-   recorder=new MediaRecorder(stream,{mimeType:mime});
+    await audioCtx.resume();
 
-   recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+    stream=new MediaStream([
 
-   recorder.onstop=()=>{
+      ...canvas.captureStream(30).getVideoTracks(),
 
-     const blob=new Blob(chunks,{type:mime});
+      ...dest.stream.getAudioTracks()
 
-     const url=URL.createObjectURL(blob);
+    ]);
 
-     const link=$("download");
+    recorder=new MediaRecorder(stream,{mimeType:mime});
 
-     link.href=url;link.download="ai-video-studio."+ (mime.includes("mp4")?"mp4":"webm");
+    recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
 
-     link.textContent="⬇ Tải video về iPhone";
+    recorder.onstop=()=>{
 
-     link.hidden=false;
+      const blob=new Blob(chunks,{type:mime});
 
-     $("status").textContent="Đã tạo video ("+Math.round(blob.size/1024/1024*10)/10+" MB). Định dạng: "+(mime.includes("mp4")?"MP4":"WebM")+".";
+      const url=URL.createObjectURL(blob);
 
-     stream.getTracks().forEach(t=>t.stop());
+      const link=$("download");
 
-   };
+      link.href=url;
 
-   $("export").disabled=true;
+      link.download="ai-video-studio-v02."+(mime.includes("mp4")?"mp4":"webm");
 
-   $("status").textContent="Đang tạo video. Hãy để trang mở đến khi hoàn tất.";
+      link.hidden=false;
 
-   recorder.start(500);
+      link.textContent="⬇ Tải video về iPhone";
 
-   playing=true;started=performance.now();animate();
+      $("status").textContent="Hoàn tất! Dung lượng: "+(blob.size/1024/1024).toFixed(1)+" MB.";
 
-   audio.currentTime=0;await audio.play();
+      stream.getTracks().forEach(t=>t.stop());
 
-   setTimeout(()=>{
+      exporting=false;$("export").disabled=false;
 
-     playing=false;cancelAnimationFrame(raf);audio.pause();
+      audio.pause();audio.loop=false;
 
-     if(recorder.state!=="inactive")recorder.stop();
+    };
 
-     $("export").disabled=false;
+    $("status").textContent="Đang tạo video, vui lòng giữ Safari mở...";
 
-   },seconds*1000);
+    recorder.start(500);
 
- }catch(err){
+    playing=true;startAt=performance.now();animate();
 
-   $("export").disabled=false;
+    audio.loop=true;audio.currentTime=0;
 
-   if(stream)stream.getTracks().forEach(t=>t.stop());
+    await audio.play();
 
-   $("status").textContent="Không thể xuất video: "+err.message+". Hãy thử lại với đoạn nhạc ngắn.";
+    setTimeout(()=>{
 
- }
+      playing=false;cancelAnimationFrame(raf);
+
+      if(recorder.state!=="inactive")recorder.stop();
+
+    },seconds*1000);
+
+  }catch(err){
+
+    if(stream)stream.getTracks().forEach(t=>t.stop());
+
+    exporting=false;$("export").disabled=false;
+
+    audio.pause();audio.loop=false;
+
+    $("status").textContent="Chưa xuất được video: "+err.message+". Hãy thử lại với ảnh ít hơn và nhạc ngắn hơn.";
+
+  }
 
 };
 
